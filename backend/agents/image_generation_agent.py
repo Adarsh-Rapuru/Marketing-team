@@ -130,6 +130,7 @@ Create a detailed DALL-E prompt for a professional marketing image.
             api_key = os.environ.get('EMERGENT_LLM_KEY')
             
             image_gen = OpenAIImageGeneration(api_key=api_key)
+            # gpt-image-1 model generates HD quality by default (1024x1024)
             images = await image_gen.generate_images(
                 prompt=dalle_prompt,
                 model="gpt-image-1",

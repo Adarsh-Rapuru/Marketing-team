@@ -20,7 +20,7 @@ const HomePage = () => {
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [hubspotConnected, setHubspotConnected] = useState(false);
+  const [zohoConnected, setZohoConnected] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en-US');
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(true);
@@ -46,17 +46,17 @@ const HomePage = () => {
   } = useVoice(handleTranscript, selectedLanguage);
 
   useEffect(() => {
-    // Check HubSpot connection status
-    checkHubSpotStatus();
+    // Check Zoho connection status
+    checkZohoStatus();
     
     // Load supported languages
     loadLanguages();
     
-    // Check if redirected from HubSpot OAuth
+    // Check if redirected from Zoho OAuth
     const params = new URLSearchParams(window.location.search);
-    if (params.get('hubspot_connected') === 'true') {
-      toast.success('HubSpot connected successfully!');
-      setHubspotConnected(true);
+    if (params.get('zoho_connected') === 'true') {
+      toast.success('Zoho connected successfully!');
+      setZohoConnected(true);
       // Clean URL
       window.history.replaceState({}, '', '/');
     }
@@ -80,23 +80,16 @@ const HomePage = () => {
     }
   };
 
-  const checkHubSpotStatus = async () => {
+  const checkZohoStatus = async () => {
     try {
-      const response = await axios.get(`${API}/hubspot/status`);
-      setHubspotConnected(response.data.connected);
+      const response = await axios.get(`${API}/zoho/status`);
+      setZohoConnected(response.data.connected);
     } catch (error) {
       console.error('Error checking HubSpot status:', error);
     }
   };
 
-  const handleConnectHubSpot = async () => {
-    try {
-      const response = await axios.get(`${API}/oauth/hubspot/authorize`);
-      window.location.href = response.data.authorization_url;
-    } catch (error) {
-      toast.error('Failed to connect HubSpot');
-    }
-  };
+  // Zoho connection is now handled through /zoho-connections page
 
   const handleSendMessage = async (textOverride = null) => {
     const textToSend = textOverride || message;
@@ -223,20 +216,20 @@ const HomePage = () => {
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            {hubspotConnected ? (
-              <Badge className="bg-green-100 text-green-700 border-green-200" data-testid="hubspot-status-badge">
+            {zohoConnected ? (
+              <Badge className="bg-green-100 text-green-700 border-green-200" data-testid="zoho-status-badge">
                 <Check className="w-3 h-3 mr-1" />
-                HubSpot Connected
+                Zoho Connected
               </Badge>
             ) : (
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={handleConnectHubSpot}
+                onClick={() => navigate('/zoho-connections')}
                 className="border-cyan-200 hover:bg-cyan-50"
-                data-testid="connect-hubspot-btn"
+                data-testid="connect-zoho-btn"
               >
-                Connect HubSpot
+                Connect Zoho
               </Button>
             )}
             <Button 
@@ -347,7 +340,7 @@ const HomePage = () => {
                 key={index}
                 className="p-6 glass border-white/30 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
                 data-testid={`feature-card-${index}`}
-                onClick={() => navigate(`/agents?agent=${feature.agentId}`)}
+                onClick={() => navigate(`/agent-chat?agent=${feature.agentId}`)}
               >
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center mb-4 text-white shadow-lg shadow-cyan-500/30 group-hover:scale-110 transition-transform">
                   {feature.icon}
